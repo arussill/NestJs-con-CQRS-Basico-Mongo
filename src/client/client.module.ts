@@ -5,7 +5,7 @@ import { ClientController } from './client.controller';
 import { ClientCreated, ClientSchema } from './entities/client-created.entity';
 import { ClientCreatedHandler } from './events/handlers/client-created.handler';
 import { CreateClientHandler } from './commands/handlers/create-client.handler';
-import { CqrsModule, EventPublisher } from '@nestjs/cqrs';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   controllers: [ClientController],
@@ -21,4 +21,4 @@ import { CqrsModule, EventPublisher } from '@nestjs/cqrs';
     ]),
   ],
 })
-export class ClientModule {}
+export class ClientModule { }

@@ -1,7 +1,3 @@
-import {
-  BadRequestException,
-  InternalServerErrorException,
-} from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { CreateClientDto } from '../dto/create-client.dto';
 import { ClientCreatedEvent } from '../events/impl/client-created.event';
@@ -19,18 +15,11 @@ export class Client extends AggregateRoot {
 
   //Metodo que lanza el evento ClientCreatedEvent
   createNewClient(createClientDto: CreateClientDto) {
-    try {
-      this.apply(new ClientCreatedEvent(createClientDto));
-    } catch (error) {
-      if (error.code == 11000) {
-        throw new BadRequestException(
-          `Client exists in db ${JSON.stringify(error.keyValue)}`,
-        );
-      }
-      throw new InternalServerErrorException(
-        `Can't create Client - Check server logs`,
-      );
-    }
+
+    this.apply(new ClientCreatedEvent(createClientDto));
+
   }
+
+
   //Todo: comprar helado evento
 }

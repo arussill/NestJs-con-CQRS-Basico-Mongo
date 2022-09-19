@@ -2,11 +2,11 @@ version: '3'
 
 services:
   db:
-    image: mongo:5
+    image: mongo:5.0.0
     restart: always
     container_name: db-mongo-cqrs
     ports:
-      - 27017:27017
+      - 27016:27017
     environment:
        MONGODB_DATABASE: nest-cqrs
     volumes:

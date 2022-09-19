@@ -1,5 +1,8 @@
-import {} from '@nestjs/common';
+import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { ClientCreated } from 'src/client/entities/client-created.entity';
 import { Client } from '../../../client/models/client.model';
 import { CreateClientCommand } from '../impl/create-client.command';
 
@@ -11,9 +14,22 @@ import { CreateClientCommand } from '../impl/create-client.command';
 export class CreateClientHandler
   implements ICommandHandler<CreateClientCommand>
 {
-  constructor(private readonly eventPublisher: EventPublisher) {}
+  constructor(
+    private readonly eventPublisher: EventPublisher,
+
+    @InjectModel(ClientCreated.name)
+    private readonly clientModel: Model<ClientCreated>,) { }
+
   async execute(createClientcommand: CreateClientCommand): Promise<any> {
+
     const { idDocument, name, lastName } = createClientcommand.createClientDto;
+
+    const existClient = await this.clientModel.exists({ idDocument })
+
+    if (existClient) {
+      throw new BadRequestException(`Ya existe el idDocument ${idDocument}`);
+    }
+
     /**
      * El mergeObjectContext une la instancia creada de cliete con los eventos para luego publicarlos
      */
@@ -24,9 +40,8 @@ export class CreateClientHandler
     //Aqui la instancia ya puede hacer uso o llamado de los eventos (lo prepara) pero no lo ejecuta
     client.createNewClient(createClientcommand.createClientDto);
 
-    //este ejecuta el evento
     client.commit();
 
-    // return client;
+    return client;
   }
 }
